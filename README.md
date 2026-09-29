@@ -6,7 +6,7 @@ A jailbreak tweak to change the delivered and read double-check colors in WhatsA
 
 WhatsApp draws its message checks from an icon font. TickTint changes the foreground color of the delivered and read glyphs when WhatsApp creates or updates them. The single check and the underlying delivery and read states are left alone.
 
-Set `Delivered` and `Read` to `#RRGGBB` or `#RRGGBBAA` colors in `/var/jb/Library/Preferences/com.liamschwie.ticktint.plist`. The included sample uses pink for delivered and green for read. Restart WhatsApp after changing the file; the colors are loaded once at launch.
+Open **Settings → TickTint** and tap **Delivered** or **Read** to choose a color with the iOS color picker. The rows show the current colors. The default sample uses pink for delivered and green for read. Fully close and reopen WhatsApp to apply changes.
 
 ## Compatible Versions
 
@@ -18,7 +18,7 @@ TickTint has been tested with WhatsApp 26.37.73. WhatsApp may change the glyphs 
 
 1. Download the latest `.deb` from [Releases](../../releases)
 2. Transfer to your device and install with Filza or your package manager
-3. Fully restart WhatsApp
+3. Close and reopen Settings to see TickTint, then fully restart WhatsApp
 
 ### Building from source
 
@@ -40,12 +40,13 @@ The tweak hooks three things:
 2. **`WAMessage prefixForMessageWithFont:senderName:includeMessageStatus:includingIconStatusV3:includingMessageTypeSymbol:preferRTL:`** — Colors the check in the Chats list message preview.
 3. **`WAReceiptTableViewCell setReceiptType:forUserJID:forMessage:`** — Colors the Delivered and Read checks on Message Info.
 
-Preferences are read once when WhatsApp launches. The hooks run only while WhatsApp creates message text or updates a receipt cell; the tweak has no timer, polling, or background work.
+The Settings pane stores colors in `com.liamschwie.ticktint` preferences. The tweak also reads the earlier preference file when it is present. WhatsApp reads preferences once at launch. The hooks run only while WhatsApp creates message text or updates a receipt cell; the tweak has no timer, polling, or background work.
 
 ## Requirements
 
 - Jailbroken iOS device
 - WhatsApp 26.37.73
+- PreferenceLoader for the Settings pane
 
 ## License
 
