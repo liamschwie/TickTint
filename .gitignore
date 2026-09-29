@@ -1,0 +1,17 @@
+# Theos build artifacts
+.theos/
+packages/
+obj/
+
+# macOS
+.DS_Store
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+
+# Local reverse-engineering notes
+recon*.js
+run_recon*.py
+/com.liamschwie.ticktint.plist
