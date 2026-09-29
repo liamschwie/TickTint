@@ -93,6 +93,9 @@ static NSAttributedString *TintGlyph(NSAttributedString *original, UIColor *colo
     CFPreferencesAppSynchronize(kPreferencesDomain);
     id delivered = CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("Delivered"), kPreferencesDomain));
     id read = CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("Read"), kPreferencesDomain));
+    id mobileStatuses = CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("Statuses"), kPreferencesDomain));
+    NSDictionary *savedStatuses = [mobileStatuses isKindOfClass:NSDictionary.class]
+        ? mobileStatuses : nil;
 
     // Preferences from releases before the Settings pane remain valid.
     NSString *path = ROOT_PATH_NS(@"/Library/Preferences/com.liamschwie.ticktint.plist");
@@ -100,9 +103,11 @@ static NSAttributedString *TintGlyph(NSAttributedString *original, UIColor *colo
     NSDictionary *statuses = [prefs[@"Statuses"] isKindOfClass:NSDictionary.class]
         ? prefs[@"Statuses"] : nil;
 
-    gDelivered = ColorFromHex(delivered) ?: ColorFromHex(prefs[@"Delivered"])
-        ?: ColorFromHex(statuses[@"5"]);
-    gRead = ColorFromHex(read) ?: ColorFromHex(prefs[@"Read"])
-        ?: ColorFromHex(statuses[@"6"]);
+    gDelivered = ColorFromHex(delivered) ?: ColorFromHex(savedStatuses[@"5"])
+        ?: ColorFromHex(prefs[@"Delivered"]) ?: ColorFromHex(statuses[@"5"])
+        ?: [UIColor colorWithRed:1 green:0.176 blue:0.333 alpha:1];
+    gRead = ColorFromHex(read) ?: ColorFromHex(savedStatuses[@"6"])
+        ?: ColorFromHex(prefs[@"Read"]) ?: ColorFromHex(statuses[@"6"])
+        ?: [UIColor colorWithRed:0 green:0.784 blue:0.325 alpha:1];
     if (gDelivered || gRead) %init;
 }

@@ -44,12 +44,19 @@ static CFStringRef const kPreferencesDomain = CFSTR("com.liamschwie.ticktint");
     UIColor *color = [self colorFromHex:stored];
     if (color) return color;
 
+    id mobileStatuses = CFBridgingRelease(CFPreferencesCopyAppValue(
+        CFSTR("Statuses"), kPreferencesDomain));
+    NSDictionary *savedStatuses = [mobileStatuses isKindOfClass:NSDictionary.class]
+        ? mobileStatuses : nil;
+    NSString *oldKey = [key isEqualToString:@"Delivered"] ? @"5" : @"6";
+    color = [self colorFromHex:savedStatuses[oldKey]];
+    if (color) return color;
+
     NSString *path = ROOT_PATH_NS(@"/Library/Preferences/com.liamschwie.ticktint.plist");
     NSDictionary *legacy = [NSDictionary dictionaryWithContentsOfFile:path];
     color = [self colorFromHex:legacy[key]];
     if (color) return color;
 
-    NSString *oldKey = [key isEqualToString:@"Delivered"] ? @"5" : @"6";
     NSDictionary *statuses = [legacy[@"Statuses"] isKindOfClass:NSDictionary.class]
         ? legacy[@"Statuses"] : nil;
     color = [self colorFromHex:statuses[oldKey]];

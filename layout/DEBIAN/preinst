@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+old="${DPKG_ROOT:-}/var/jb/Library/Preferences/com.liamschwie.ticktint.plist"
+new="${DPKG_ROOT:-}/var/mobile/Library/Preferences/com.liamschwie.ticktint.plist"
+
+if [ -f "$old" ] && [ ! -e "$new" ]; then
+    mkdir -p "$(dirname "$new")"
+    cp "$old" "$new"
+    chown mobile:mobile "$new" 2>/dev/null || true
+    chmod 0644 "$new"
+fi
+
+exit 0
