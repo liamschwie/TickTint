@@ -1,6 +1,6 @@
 Package: com.liamschwie.ticktint
 Name: TickTint
-Version: 1.1.0
+Version: 1.1.1
 Architecture: iphoneos-arm64
 Description: Change WhatsApp delivered and read check colors.
 Maintainer: Liam

@@ -24,10 +24,14 @@ static CFStringRef const kPreferencesDomain = CFSTR("com.liamschwie.ticktint");
     PSSpecifier *delivered = [PSSpecifier preferenceSpecifierNamed:@"Delivered"
         target:self set:NULL get:NULL detail:Nil cell:PSLinkCell edit:Nil];
     delivered.identifier = @"Delivered";
+    delivered->action = @selector(openColorPicker:);
+    [delivered setProperty:@YES forKey:@"enabled"];
 
     PSSpecifier *read = [PSSpecifier preferenceSpecifierNamed:@"Read"
         target:self set:NULL get:NULL detail:Nil cell:PSLinkCell edit:Nil];
     read.identifier = @"Read";
+    read->action = @selector(openColorPicker:);
+    [read setProperty:@YES forKey:@"enabled"];
 
     _specifiers = [NSMutableArray arrayWithObjects:group, delivered, read, nil];
     return _specifiers;
@@ -111,9 +115,7 @@ static CFStringRef const kPreferencesDomain = CFSTR("com.liamschwie.ticktint");
     return cell;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    PSSpecifier *specifier = [self specifierAtIndexPath:indexPath];
+- (void)openColorPicker:(PSSpecifier *)specifier {
     NSString *key = specifier.identifier;
     if (![key isEqualToString:@"Delivered"] && ![key isEqualToString:@"Read"]) return;
 
