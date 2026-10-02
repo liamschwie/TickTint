@@ -40,7 +40,7 @@ The tweak hooks three things:
 2. **`WAMessage prefixForMessageWithFont:senderName:includeMessageStatus:includingIconStatusV3:includingMessageTypeSymbol:preferRTL:`** — Colors the check in the Chats list message preview.
 3. **`WAReceiptTableViewCell setReceiptType:forUserJID:forMessage:`** — Colors the Delivered and Read checks on Message Info.
 
-The Settings pane stores colors in `com.liamschwie.ticktint` preferences. When upgrading from an earlier release, the installer copies existing colors into that domain. WhatsApp reads preferences once at launch. The hooks run only while WhatsApp creates message text or updates a receipt cell; the tweak has no timer, polling, or background work.
+The Settings pane stores colors in `/var/jb/Library/Preferences/com.liamschwie.ticktint.plist`, a file sandboxed WhatsApp can read. When upgrading, the installer carries existing colors into that file. WhatsApp reads preferences once at launch. The hooks run only while WhatsApp creates message text or updates a receipt cell; the tweak has no timer, polling, or background work.
 
 ## Requirements
 

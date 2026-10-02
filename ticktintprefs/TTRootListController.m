@@ -44,10 +44,20 @@ static CFStringRef const kPreferencesDomain = CFSTR("com.liamschwie.ticktint");
     self.title = @"TickTint";
 }
 
+// WhatsApp is sandboxed and cannot read CFPreferences written by Settings,
+// so both sides share this file in the jailbreak root.
+static NSString *PrefsPath(void) {
+    return ROOT_PATH_NS(@"/Library/Preferences/com.liamschwie.ticktint.plist");
+}
+
 - (UIColor *)colorForKey:(NSString *)key {
+    NSDictionary *legacy = [NSDictionary dictionaryWithContentsOfFile:PrefsPath()];
+    UIColor *color = [self colorFromHex:legacy[key]];
+    if (color) return color;
+
     id stored = CFBridgingRelease(CFPreferencesCopyAppValue((__bridge CFStringRef)key,
                                                              kPreferencesDomain));
-    UIColor *color = [self colorFromHex:stored];
+    color = [self colorFromHex:stored];
     if (color) return color;
 
     id mobileStatuses = CFBridgingRelease(CFPreferencesCopyAppValue(
@@ -56,11 +66,6 @@ static CFStringRef const kPreferencesDomain = CFSTR("com.liamschwie.ticktint");
         ? mobileStatuses : nil;
     NSString *oldKey = [key isEqualToString:@"Delivered"] ? @"5" : @"6";
     color = [self colorFromHex:savedStatuses[oldKey]];
-    if (color) return color;
-
-    NSString *path = ROOT_PATH_NS(@"/Library/Preferences/com.liamschwie.ticktint.plist");
-    NSDictionary *legacy = [NSDictionary dictionaryWithContentsOfFile:path];
-    color = [self colorFromHex:legacy[key]];
     if (color) return color;
 
     NSDictionary *statuses = [legacy[@"Statuses"] isKindOfClass:NSDictionary.class]
@@ -143,13 +148,16 @@ static CFStringRef const kPreferencesDomain = CFSTR("com.liamschwie.ticktint");
         (unsigned)lround(MIN(1, MAX(0, red)) * 255),
         (unsigned)lround(MIN(1, MAX(0, green)) * 255),
         (unsigned)lround(MIN(1, MAX(0, blue)) * 255)];
-    id oldValue = CFBridgingRelease(CFPreferencesCopyAppValue(
-        (__bridge CFStringRef)_selectedKey, kPreferencesDomain));
-    if ([hex isEqualToString:oldValue]) return;
+    NSMutableDictionary *prefs = [NSMutableDictionary
+        dictionaryWithContentsOfFile:PrefsPath()] ?: [NSMutableDictionary new];
+    if ([hex isEqualToString:prefs[_selectedKey]]) return;
 
-    CFPreferencesSetAppValue((__bridge CFStringRef)_selectedKey,
-                             (__bridge CFPropertyListRef)hex, kPreferencesDomain);
-    CFPreferencesAppSynchronize(kPreferencesDomain);
+    prefs[_selectedKey] = hex;
+    // Not atomic: the directory is root-owned, only the file belongs to mobile.
+    if (![prefs writeToFile:PrefsPath() atomically:NO]) {
+        NSLog(@"[TickTint] Failed to write %@", PrefsPath());
+        return;
+    }
     UIView *swatch = [_selectedKey isEqualToString:@"Delivered"]
         ? _deliveredSwatch : _readSwatch;
     swatch.backgroundColor = color;

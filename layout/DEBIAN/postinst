@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# The Settings pane runs as mobile and writes this file in place;
+# WhatsApp reads it at launch.
+prefs="${DPKG_ROOT:-}/var/jb/Library/Preferences/com.liamschwie.ticktint.plist"
+saved="${DPKG_ROOT:-}/var/mobile/Library/Preferences/com.liamschwie.ticktint.plist"
+
+if [ -d "$(dirname "$prefs")" ]; then
+    if [ ! -f "$prefs" ]; then
+        if [ -f "$saved" ]; then
+            cp "$saved" "$prefs"
+        else
+            printf '%s\n' '<?xml version="1.0" encoding="UTF-8"?>' \
+                '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' \
+                '<plist version="1.0"><dict/></plist>' > "$prefs"
+        fi
+    fi
+    chown mobile:mobile "$prefs" 2>/dev/null || chown 501:501 "$prefs" 2>/dev/null
+    chmod 0644 "$prefs"
+fi
+
+exit 0
