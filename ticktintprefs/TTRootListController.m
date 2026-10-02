@@ -12,6 +12,8 @@ static CFStringRef const kPreferencesDomain = CFSTR("com.liamschwie.ticktint");
 @implementation TTRootListController {
     NSString *_selectedKey;
     UIColorPickerViewController *_picker;
+    __weak UIView *_deliveredSwatch;
+    __weak UIView *_readSwatch;
 }
 
 - (NSArray *)specifiers {
@@ -102,6 +104,11 @@ static CFStringRef const kPreferencesDomain = CFSTR("com.liamschwie.ticktint");
     swatch.layer.borderWidth = 0.5;
     swatch.layer.borderColor = UIColor.separatorColor.CGColor;
     [accessory addSubview:swatch];
+    if ([specifier.identifier isEqualToString:@"Delivered"]) {
+        _deliveredSwatch = swatch;
+    } else {
+        _readSwatch = swatch;
+    }
 
     UIImageView *chevron = [[UIImageView alloc] initWithImage:
         [UIImage systemImageNamed:@"chevron.right"]];
@@ -143,7 +150,9 @@ static CFStringRef const kPreferencesDomain = CFSTR("com.liamschwie.ticktint");
     CFPreferencesSetAppValue((__bridge CFStringRef)_selectedKey,
                              (__bridge CFPropertyListRef)hex, kPreferencesDomain);
     CFPreferencesAppSynchronize(kPreferencesDomain);
-    [self.tableView reloadData];
+    UIView *swatch = [_selectedKey isEqualToString:@"Delivered"]
+        ? _deliveredSwatch : _readSwatch;
+    swatch.backgroundColor = color;
 }
 
 - (void)colorPickerViewController:(UIColorPickerViewController *)viewController
