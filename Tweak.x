@@ -11,7 +11,6 @@
 
 static UIColor *gDelivered;
 static UIColor *gRead;
-static CFStringRef const kPreferencesDomain = CFSTR("com.liamschwie.ticktint");
 
 static UIColor *ColorFromHex(id value) {
     if (![value isKindOfClass:NSString.class]) return nil;
@@ -90,24 +89,12 @@ static NSAttributedString *TintGlyph(NSAttributedString *original, UIColor *colo
 %end
 
 %ctor {
-    CFPreferencesAppSynchronize(kPreferencesDomain);
-    id delivered = CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("Delivered"), kPreferencesDomain));
-    id read = CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("Read"), kPreferencesDomain));
-    id mobileStatuses = CFBridgingRelease(CFPreferencesCopyAppValue(CFSTR("Statuses"), kPreferencesDomain));
-    NSDictionary *savedStatuses = [mobileStatuses isKindOfClass:NSDictionary.class]
-        ? mobileStatuses : nil;
-
+    // Written by the Settings pane; sandboxed WhatsApp cannot read CFPreferences.
     NSString *path = ROOT_PATH_NS(@"/Library/Preferences/com.liamschwie.ticktint.plist");
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:path];
-    NSDictionary *statuses = [prefs[@"Statuses"] isKindOfClass:NSDictionary.class]
-        ? prefs[@"Statuses"] : nil;
-
-    // The Settings pane writes this file; sandboxed WhatsApp can't see its CFPreferences.
-    gDelivered = ColorFromHex(prefs[@"Delivered"]) ?: ColorFromHex(delivered)
-        ?: ColorFromHex(savedStatuses[@"5"]) ?: ColorFromHex(statuses[@"5"])
+    gDelivered = ColorFromHex(prefs[@"Delivered"])
         ?: [UIColor colorWithRed:1 green:0.176 blue:0.333 alpha:1];
-    gRead = ColorFromHex(prefs[@"Read"]) ?: ColorFromHex(read)
-        ?: ColorFromHex(savedStatuses[@"6"]) ?: ColorFromHex(statuses[@"6"])
+    gRead = ColorFromHex(prefs[@"Read"])
         ?: [UIColor colorWithRed:0 green:0.784 blue:0.325 alpha:1];
-    if (gDelivered || gRead) %init;
+    %init;
 }

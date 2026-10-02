@@ -4,8 +4,6 @@
 #import <rootless.h>
 #import <math.h>
 
-static CFStringRef const kPreferencesDomain = CFSTR("com.liamschwie.ticktint");
-
 @interface TTRootListController : PSListController <UIColorPickerViewControllerDelegate>
 @end
 
@@ -44,34 +42,14 @@ static CFStringRef const kPreferencesDomain = CFSTR("com.liamschwie.ticktint");
     self.title = @"TickTint";
 }
 
-// WhatsApp is sandboxed and cannot read CFPreferences written by Settings,
-// so both sides share this file in the jailbreak root.
+// Sandboxed WhatsApp cannot read CFPreferences, so both sides share this file.
 static NSString *PrefsPath(void) {
     return ROOT_PATH_NS(@"/Library/Preferences/com.liamschwie.ticktint.plist");
 }
 
 - (UIColor *)colorForKey:(NSString *)key {
-    NSDictionary *legacy = [NSDictionary dictionaryWithContentsOfFile:PrefsPath()];
-    UIColor *color = [self colorFromHex:legacy[key]];
-    if (color) return color;
-
-    id stored = CFBridgingRelease(CFPreferencesCopyAppValue((__bridge CFStringRef)key,
-                                                             kPreferencesDomain));
-    color = [self colorFromHex:stored];
-    if (color) return color;
-
-    id mobileStatuses = CFBridgingRelease(CFPreferencesCopyAppValue(
-        CFSTR("Statuses"), kPreferencesDomain));
-    NSDictionary *savedStatuses = [mobileStatuses isKindOfClass:NSDictionary.class]
-        ? mobileStatuses : nil;
-    NSString *oldKey = [key isEqualToString:@"Delivered"] ? @"5" : @"6";
-    color = [self colorFromHex:savedStatuses[oldKey]];
-    if (color) return color;
-
-    NSDictionary *statuses = [legacy[@"Statuses"] isKindOfClass:NSDictionary.class]
-        ? legacy[@"Statuses"] : nil;
-    color = [self colorFromHex:statuses[oldKey]];
-    return color ?: ([key isEqualToString:@"Delivered"]
+    NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:PrefsPath()];
+    return [self colorFromHex:prefs[key]] ?: ([key isEqualToString:@"Delivered"]
         ? [UIColor colorWithRed:1 green:0.176 blue:0.333 alpha:1]
         : [UIColor colorWithRed:0 green:0.784 blue:0.325 alpha:1]);
 }
