@@ -51,9 +51,11 @@ static NSAttributedString *TintGlyph(NSAttributedString *original, UIColor *colo
 
 %hook WAMessageStatusSlice
 
+// Chat bubbles call this directly; the 3-arg variant forwards here with hidesPendingClock:NO.
 - (NSAttributedString *)attributedStringForSliceModel:(id)model
                                         footerStatus:(NSUInteger)status
-                                         messageType:(int)messageType {
+                                         messageType:(int)messageType
+                                   hidesPendingClock:(BOOL)hidesPendingClock {
     return TintGlyph(%orig, ColorForStatus(status), @"\uE711");
 }
 

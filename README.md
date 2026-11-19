@@ -10,7 +10,7 @@ Open **Settings → TickTint** and tap **Delivered** or **Read** to choose a col
 
 ## Compatible Versions
 
-TickTint has been tested with WhatsApp 26.37.73. WhatsApp may change the glyphs or the methods used to draw them in other versions.
+TickTint has been tested with WhatsApp 26.45.75. WhatsApp may change the glyphs or the methods used to draw them in other versions.
 
 ## Installation
 
@@ -36,7 +36,7 @@ The `.deb` will be in the `packages/` directory. The default build targets **roo
 
 The tweak hooks three things:
 
-1. **`WAMessageStatusSlice attributedStringForSliceModel:footerStatus:messageType:`** — Colors the double check in individual chat bubbles. Footer status `5` is delivered and `6` is read.
+1. **`WAMessageStatusSlice attributedStringForSliceModel:footerStatus:messageType:hidesPendingClock:`** — Colors the double check in individual chat bubbles. Footer status `5` is delivered and `6` is read.
 2. **`WAMessage prefixForMessageWithFont:senderName:includeMessageStatus:includingIconStatusV3:includingMessageTypeSymbol:preferRTL:`** — Colors the check in the Chats list message preview.
 3. **`WAReceiptTableViewCell setReceiptType:forUserJID:forMessage:`** — Colors the Delivered and Read checks on Message Info.
 
@@ -45,7 +45,7 @@ The Settings pane stores colors in `/var/jb/Library/Preferences/com.liamschwie.t
 ## Requirements
 
 - Jailbroken iOS device
-- WhatsApp 26.37.73
+- WhatsApp 26.45.75
 - PreferenceLoader for the Settings pane
 
 ## License
